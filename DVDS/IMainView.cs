@@ -18,5 +18,7 @@ namespace DVDS
 
         void ShowDisksList(ArrayList disks, DataGridView table);
         DataGridView GetDisksGridView();
+
+        Session GetUserSession();
     }
 }

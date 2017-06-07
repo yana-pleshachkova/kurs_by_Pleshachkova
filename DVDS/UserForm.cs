@@ -6,6 +6,7 @@ namespace DVDS
     public partial class UserForm : Form, IUserFormView
     {
         private readonly UserFormPresenter _presenter;
+        private readonly Session _userSession;
 
         public UserForm()
         {
@@ -13,10 +14,18 @@ namespace DVDS
             _presenter = new UserFormPresenter(this);
         }
 
-        public UserForm(int id)
+        public UserForm(Session userSession)
         {
             InitializeComponent();
             _presenter = new UserFormPresenter(this);
+            _userSession = userSession;
+        }
+
+        public UserForm(int id, Session userSession)
+        {
+            InitializeComponent();
+            _presenter = new UserFormPresenter(this);
+            _userSession = userSession;
 
             _presenter.SetUserFields(id);
         }
@@ -79,6 +88,11 @@ namespace DVDS
         public void ShowAlert(string alert)
         {
             MessageBox.Show(alert);
+        }
+
+        public Session GetUserSession()
+        {
+            return _userSession;
         }
     }
 }

@@ -4,5 +4,6 @@
     {
         void SetUserFields(User user);
         void ShowAlert(string alert);
+        Session GetUserSession();
     }
 }

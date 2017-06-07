@@ -252,5 +252,10 @@ namespace DVDS
                 table.Rows.Add(row);
             }
         }
+
+        public Session GetUserSession()
+        {
+            return SessionUser;
+        }
     }
 }

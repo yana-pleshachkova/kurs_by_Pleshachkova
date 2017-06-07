@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Security.Cryptography;
 using System.Text;
 using MySql.Data.MySqlClient;
@@ -14,7 +13,7 @@ namespace DVDS
         /*
          * Основные поля пользователя
          */
-        public int Id { get; protected set; }
+        public int Id { get; protected internal set; }
         public string Login { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
@@ -26,9 +25,9 @@ namespace DVDS
         public int PassportNumber { get; set; }
         public DateTime PassportYear { get; set; }
         public string PassportIssuer { get; set; }
-        public DateTime CreatedAt { get; protected set; }
+        public DateTime CreatedAt { get; protected internal set; }
         public DateTime DeletedAt { get; protected set; }
-        public DateTime UpdatedAt { get; protected set; }
+        public DateTime UpdatedAt { get; protected internal set; }
         public int Role { get; set; }
 
         /*
@@ -189,200 +188,6 @@ namespace DVDS
         }
 
         /*
-         * Удалить пользователя из системы по id
-         */
-        public static bool DeleteUser(int id = 0)
-        {
-            DbConnect connect = new DbConnect(); // Создаем экземпляр коннектора к БД
-
-            if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
-            {
-                // Формируем команду для выбора 1-го пользователя по ID
-                // Будем использовать подготовленные запросы для защиты БД
-                MySqlCommand cmd = connect.Connection.CreateCommand();
-                cmd.CommandText = "UPDATE `users` SET `deleted_at` = CURRENT_TIMESTAMP WHERE `id` = @userId";
-                cmd.Parameters.AddWithValue("@userId", id);
-                cmd.Prepare();
-
-                MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
-
-                if (userData.RecordsAffected != 0) // Если запрос возвратил какой-либо результат, то
-                {
-                    connect.CloseConnection(); // Закрываем соединение с БД
-
-                    return true; // Возвращаем результат
-                }
-
-                // если данных небыло
-                connect.CloseConnection(); // Закрываем соединение с БД
-
-                return false; // Возвращаем результат
-            }
-
-            return false;
-        }
-
-        /*
-         * Удалить пользователя из системы по id
-         */
-        public bool UpdateUser()
-        {
-            DbConnect connect = new DbConnect(); // Создаем экземпляр коннектора к БД
-
-            if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
-            {
-                // Формируем команду для выбора 1-го пользователя по ID
-                // Будем использовать подготовленные запросы для защиты БД
-                MySqlCommand cmd = connect.Connection.CreateCommand();
-                cmd.CommandText = "UPDATE `users` SET `first_name` = @first_name, `last_name` = @last_name, " +
-                                  "`patronumyc` = @patronumyc, `phones` = @phones, " +
-                                  "`birth_date` = @birth_date, `passport_number` = @passport_number, " +
-                                  "`passport_year` = @passport_year, `passport_issuer` = @passport_issuer, " +
-                                  "`login` = @login, `email` = @email, " +
-                                  "`role` = @role, `password_hash` = @password_hash WHERE `id` = @userId";
-                cmd.Parameters.AddWithValue("@userId", Id);
-                cmd.Parameters.AddWithValue("@phones", Phones);
-                cmd.Parameters.AddWithValue("@first_name", FirstName);
-                cmd.Parameters.AddWithValue("@last_name", LastName);
-                cmd.Parameters.AddWithValue("@patronumyc", Patrnumyc);
-                cmd.Parameters.AddWithValue("@birth_date", BirthDate);
-                cmd.Parameters.AddWithValue("@passport_number", PassportNumber);
-                cmd.Parameters.AddWithValue("@passport_year", PassportYear);
-                cmd.Parameters.AddWithValue("@passport_issuer", PassportIssuer);
-                cmd.Parameters.AddWithValue("@login", Login);
-                cmd.Parameters.AddWithValue("@email", Email);
-                cmd.Parameters.AddWithValue("@role", Role);
-                cmd.Parameters.AddWithValue("@password_hash", HashPassword(Password));
-                cmd.Prepare();
-
-                MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
-
-                if (userData.RecordsAffected != 0) // Если запрос возвратил какой-либо результат, то
-                {
-                    connect.CloseConnection(); // Закрываем соединение с БД
-
-                    return true; // Возвращаем результат
-                }
-
-                // если данных небыло
-                connect.CloseConnection(); // Закрываем соединение с БД
-
-                return false; // Возвращаем результат
-            }
-
-            return false;
-        }
-
-        /*
-         * Удалить пользователя из системы по id
-         */
-        public bool CreateUser()
-        {
-            DbConnect connect = new DbConnect(); // Создаем экземпляр коннектора к БД
-
-            if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
-            {
-                // Формируем команду для выбора 1-го пользователя по ID
-                // Будем использовать подготовленные запросы для защиты БД
-                MySqlCommand cmd = connect.Connection.CreateCommand();
-                cmd.CommandText = "INSERT INTO `users` VALUES (NULL, @first_name, @last_name, @patronumyc, " +
-                                  "@phones, @birth_date, @passport_number, @passport_year, @passport_issuer, " +
-                                  "NULL, NULL, NULL, @login, @password_hash, @email, @role)";
-                cmd.Parameters.AddWithValue("@phones", Phones);
-                cmd.Parameters.AddWithValue("@first_name", FirstName);
-                cmd.Parameters.AddWithValue("@last_name", LastName);
-                cmd.Parameters.AddWithValue("@patronumyc", Patrnumyc);
-                cmd.Parameters.AddWithValue("@birth_date", BirthDate);
-                cmd.Parameters.AddWithValue("@passport_number", PassportNumber);
-                cmd.Parameters.AddWithValue("@passport_year", PassportYear);
-                cmd.Parameters.AddWithValue("@passport_issuer", PassportIssuer);
-                cmd.Parameters.AddWithValue("@login", Login);
-                cmd.Parameters.AddWithValue("@email", Email);
-                cmd.Parameters.AddWithValue("@role", Role);
-                cmd.Parameters.AddWithValue("@password_hash", HashPassword(Password));
-                cmd.Prepare();
-
-                int userDataAffectedRows = cmd.ExecuteNonQuery(); // Выполним запрос
-
-                if (userDataAffectedRows != 0) // Если запрос возвратил какой-либо результат, то
-                {
-                    connect.CloseConnection(); // Закрываем соединение с БД
-
-                    return true; // Возвращаем результат
-                }
-
-                // если данных небыло
-                connect.CloseConnection(); // Закрываем соединение с БД
-
-                return false; // Возвращаем результат
-            }
-
-            return false;
-        }
-
-        /*
-         * Получить список пользователей по идентификатору роли 
-         */
-        public static ArrayList GetUsersByRole(int role)
-        {
-            var users = new ArrayList();
-
-            DbConnect connect = new DbConnect(); // Создаем экземпляр коннектора к БД
-
-            if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
-            {
-                // Формируем команду для выбора 1-го пользователя по ID
-                // Будем использовать подготовленные запросы для защиты БД
-                MySqlCommand cmd = connect.Connection.CreateCommand();
-                cmd.CommandText = "SELECT * FROM `users` WHERE `role` = @role AND `deleted_at` IS NULL";
-                cmd.Parameters.AddWithValue("@role", role);
-                cmd.Prepare();
-
-                MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
-
-                if (userData.HasRows) // Если запрос возвратил какой-либо результат, то
-                {
-                    while (userData.Read()) // Считываем данные - здесь приходит только 1 строка
-                    {
-                        // Создаем новый объект пользователя
-                        User userInfo = new User(
-                            userData["login"].ToString(),
-                            "",
-                            userData["email"].ToString(),
-                            userData["first_name"].ToString(),
-                            userData["last_name"].ToString(),
-                            userData["patronumyc"].ToString(),
-                            userData["phones"].ToString(),
-                            DateTime.Parse(userData["birth_date"].ToString()),
-                            int.Parse(userData["passport_number"].ToString()),
-                            DateTime.Parse(userData["passport_year"].ToString()),
-                            userData["passport_issuer"].ToString()
-                        )
-                        {
-                            Id = int.Parse(userData["id"].ToString()),
-                            CreatedAt = DateTime.Parse(userData["created_at"].ToString()),
-                            UpdatedAt = DateTime.Parse(userData["updated_at"].ToString()),
-                            Role = int.Parse(userData["role"].ToString())
-                        };
-
-                        users.Add(userInfo);
-                    }
-
-                    connect.CloseConnection(); // Закрываем соединение с БД
-
-                    return users;
-                }
-
-                // если данных небыло
-                connect.CloseConnection(); // Закрываем соединение с БД
-
-                return null; // Возвращаем результат
-            }
-
-            return null;
-        }
-
-        /*
          * Создание сессии пользователя
          */
         public Session CreateSession()
@@ -442,66 +247,59 @@ namespace DVDS
         }
 
         /*
-         * Получить список пользователей по идентификатору роли 
-         */
-        public static ArrayList UsersSearch(string searchText, int role)
+        * Обновить информацию о пользователе по ID
+        */
+        public bool UpdateUser(Session userSession)
         {
-            var users = new ArrayList();
-
-            DbConnect connect = new DbConnect(); // Создаем экземпляр коннектора к БД
-
-            if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
+            if (userSession.Role == 1 || userSession.Role == 2)
             {
-                // Формируем команду для выбора 1-го пользователя по ID
-                // Будем использовать подготовленные запросы для защиты БД
-                MySqlCommand cmd = connect.Connection.CreateCommand();
-                cmd.CommandText = "SELECT * FROM `users` WHERE (`first_name` LIKE @searchText OR `last_name` LIKE @searchText OR `patronumyc` LIKE @searchText OR `phones` LIKE @searchText) AND `deleted_at` IS NULL AND `role` = @role";
-                cmd.Parameters.AddWithValue("@searchText", "%" + searchText + "%");
-                cmd.Parameters.AddWithValue("@role", role);
-                cmd.Prepare();
+                DbConnect connect = new DbConnect(); // Создаем экземпляр коннектора к БД
 
-                MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
-
-                if (userData.HasRows) // Если запрос возвратил какой-либо результат, то
+                if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
                 {
-                    while (userData.Read()) // Считываем данные - здесь приходит только 1 строка
-                    {
-                        // Создаем новый объект пользователя
-                        User userInfo = new User(
-                            userData["login"].ToString(),
-                            "",
-                            userData["email"].ToString(),
-                            userData["first_name"].ToString(),
-                            userData["last_name"].ToString(),
-                            userData["patronumyc"].ToString(),
-                            userData["phones"].ToString(),
-                            DateTime.Parse(userData["birth_date"].ToString()),
-                            int.Parse(userData["passport_number"].ToString()),
-                            DateTime.Parse(userData["passport_year"].ToString()),
-                            userData["passport_issuer"].ToString()
-                        )
-                        {
-                            Id = int.Parse(userData["id"].ToString()),
-                            CreatedAt = DateTime.Parse(userData["created_at"].ToString()),
-                            UpdatedAt = DateTime.Parse(userData["updated_at"].ToString()),
-                            Role = int.Parse(userData["role"].ToString())
-                        };
+                    // Формируем команду для выбора 1-го пользователя по ID
+                    // Будем использовать подготовленные запросы для защиты БД
+                    MySqlCommand cmd = connect.Connection.CreateCommand();
+                    cmd.CommandText = "UPDATE `users` SET `first_name` = @first_name, `last_name` = @last_name, " +
+                                      "`patronumyc` = @patronumyc, `phones` = @phones, " +
+                                      "`birth_date` = @birth_date, `passport_number` = @passport_number, " +
+                                      "`passport_year` = @passport_year, `passport_issuer` = @passport_issuer, " +
+                                      "`login` = @login, `email` = @email, " +
+                                      "`role` = @role, `password_hash` = @password_hash WHERE `id` = @userId";
+                    cmd.Parameters.AddWithValue("@userId", Id);
+                    cmd.Parameters.AddWithValue("@phones", Phones);
+                    cmd.Parameters.AddWithValue("@first_name", FirstName);
+                    cmd.Parameters.AddWithValue("@last_name", LastName);
+                    cmd.Parameters.AddWithValue("@patronumyc", Patrnumyc);
+                    cmd.Parameters.AddWithValue("@birth_date", BirthDate);
+                    cmd.Parameters.AddWithValue("@passport_number", PassportNumber);
+                    cmd.Parameters.AddWithValue("@passport_year", PassportYear);
+                    cmd.Parameters.AddWithValue("@passport_issuer", PassportIssuer);
+                    cmd.Parameters.AddWithValue("@login", Login);
+                    cmd.Parameters.AddWithValue("@email", Email);
+                    cmd.Parameters.AddWithValue("@role", Role);
+                    cmd.Parameters.AddWithValue("@password_hash", HashPassword(Password));
+                    cmd.Prepare();
 
-                        users.Add(userInfo);
+                    MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
+
+                    if (userData.RecordsAffected != 0) // Если запрос возвратил какой-либо результат, то
+                    {
+                        connect.CloseConnection(); // Закрываем соединение с БД
+
+                        return true; // Возвращаем результат
                     }
 
+                    // если данных небыло
                     connect.CloseConnection(); // Закрываем соединение с БД
 
-                    return users;
+                    return false; // Возвращаем результат
                 }
 
-                // если данных небыло
-                connect.CloseConnection(); // Закрываем соединение с БД
-
-                return null; // Возвращаем результат
+                return false;
             }
 
-            return null;
+            return false;
         }
 
         /*

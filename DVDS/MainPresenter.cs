@@ -20,7 +20,13 @@ namespace DVDS
          */
         public void LoadUsersByRole(int role, DataGridView table)
         {
-            ArrayList users = User.GetUsersByRole(role);
+            ArrayList users = null;
+
+            if (_view.GetUserSession().Role == 1 || _view.GetUserSession().Role == 2)
+            {
+                users = Manager.GetUsersByRole(role);
+            }
+
             if (!Equals(users, null))
             {
                 _view.ShowUsersList(users, table);
@@ -202,7 +208,7 @@ namespace DVDS
                 return;
             }
 
-            UserForm userCard = new UserForm();
+            UserForm userCard = new UserForm(_view.GetUserSession());
             userCard.FormClosed += UserCardClose;
             userCard.ShowDialog();
         }
@@ -238,7 +244,7 @@ namespace DVDS
                     int rowIndex = selectedGridView.CurrentRow.Index; // получаем идентификтор выделенной строки
                     int userId = int.Parse(selectedGridView.Rows[rowIndex].Cells[0].Value.ToString());
 
-                    UserForm userCard = new UserForm(userId);
+                    UserForm userCard = new UserForm(userId, _view.GetUserSession());
                     userCard.FormClosed += UserCardClose;
                     userCard.ShowDialog();
 
@@ -277,7 +283,7 @@ namespace DVDS
                     int rowIndex = selectedGridView.CurrentRow.Index; // получаем идентификтор выделенной строки
                     int userId = int.Parse(selectedGridView.Rows[rowIndex].Cells[0].Value.ToString());
 
-                    User.DeleteUser(userId);
+                    Admin.DeleteUser(userId);
                     LoadUsersByRole(selectedTab, selectedGridView);
 
                     return;
@@ -304,7 +310,12 @@ namespace DVDS
 
             if (!Equals(selectedGridView, null))
             {
-                ArrayList users = User.UsersSearch(searchText, selectedTab);
+                ArrayList users = null;
+
+                if (_view.GetUserSession().Role == 1 || _view.GetUserSession().Role == 2)
+                {
+                    users = Manager.UsersSearch(searchText, selectedTab);
+                }
 
                 if (!Equals(users, null))
                 {

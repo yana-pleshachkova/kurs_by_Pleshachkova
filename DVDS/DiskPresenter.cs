@@ -95,7 +95,7 @@ namespace DVDS
 
                 return _disk.CreateDisk();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 _view.ShowAlert("Ошибка при сохранении данных диска. Попробуйте еще раз, пожалуйста.");
 

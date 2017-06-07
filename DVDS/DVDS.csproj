@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Admin.cs" />
     <Compile Include="Countries.cs" />
     <Compile Include="DBConnect.cs" />
     <Compile Include="DiskForm.cs">
@@ -81,6 +82,7 @@
     </Compile>
     <Compile Include="LoginPresenter.cs" />
     <Compile Include="MainPresenter.cs" />
+    <Compile Include="Manager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session.cs" />
