@@ -205,20 +205,32 @@ namespace DVDS
          */
         public DataGridView GetSelectedGridView(int tabId)
         {
-            if (tabId == 1)
-            {
-                return userAdminGrid;
+            if (SessionUser.Role == 1) {
+                if (tabId == 1)
+                {
+                    return userAdminGrid;
+                }
+
+                if (tabId == 2)
+                {
+                    return userManagerGrid;
+                }
+
+                if (tabId == 3)
+                {
+                    return userClientGrid;
+                }
             }
 
-            if (tabId == 2)
+
+            if (SessionUser.Role == 2)
             {
-                return userManagerGrid;
+                if (tabId == 1)
+                {
+                    return userClientGrid;
+                }
             }
 
-            if (tabId == 3)
-            {
-                return userClientGrid;
-            }
 
             return null;
         }

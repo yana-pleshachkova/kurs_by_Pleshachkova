@@ -14,7 +14,7 @@ namespace DVDS
         // Конструктор класса
         public DbConnect()
         {
-            Initialize();
+            Initialize(); //вызов метода инициализации
         }
 
         // Инициализация соединения с БД
@@ -23,7 +23,7 @@ namespace DVDS
             _server = "localhost";
             _database = "DVD";
             _uid = "root";
-            _password = "";
+            _password = ""; //тестируем локально, поэтому может быть такой пароль
 
             var connectionString = "SERVER=" + _server + ";" + "DATABASE=" +
                                       _database + ";" + "UID=" + _uid + ";" + "PASSWORD=" + _password + ";";
@@ -34,7 +34,7 @@ namespace DVDS
         // Открываем соединение с БД
         public bool OpenConnection()
         {
-            try
+            try //блок обработки ошибок, если ошибка перейдет в блок catch
             {
                 Connection.Open();
                 return true;
@@ -42,13 +42,13 @@ namespace DVDS
             catch (MySqlException ex)
             {
                 // Обработка ошибок
-                switch (ex.Number)
+                switch (ex.Number) //свитч для работы с кейсами действий
                 {
-                    case 0:
+                    case 0: //номер ошибки которая может выйти
                         MessageBox.Show(@"Невозможно установить соедения с БД. Свяжитесь с администратором.");
                         break;
 
-                    case 1045:
+                    case 1045: ////номер ошибки которая может выйти
                         MessageBox.Show(@"Некорректный логин/пароль. Попробуйте еще раз.");
                         break;
                 }

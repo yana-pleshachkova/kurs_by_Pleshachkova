@@ -31,56 +31,9 @@ namespace DVDS
         /*
          * Обновить информацию о пользователе по ID
          */
-        public bool UpdateUser()
-        {
-            DbConnect connect = new DbConnect(); // Создаем экземпляр коннектора к БД
-
-            if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
-            {
-                // Формируем команду для выбора 1-го пользователя по ID
-                // Будем использовать подготовленные запросы для защиты БД
-                MySqlCommand cmd = connect.Connection.CreateCommand();
-                cmd.CommandText = "UPDATE `users` SET `first_name` = @first_name, `last_name` = @last_name, " +
-                                  "`patronumyc` = @patronumyc, `phones` = @phones, " +
-                                  "`birth_date` = @birth_date, `passport_number` = @passport_number, " +
-                                  "`passport_year` = @passport_year, `passport_issuer` = @passport_issuer, " +
-                                  "`login` = @login, `email` = @email, " +
-                                  "`role` = @role, `password_hash` = @password_hash WHERE `id` = @userId";
-                cmd.Parameters.AddWithValue("@userId", Id);
-                cmd.Parameters.AddWithValue("@phones", Phones);
-                cmd.Parameters.AddWithValue("@first_name", FirstName);
-                cmd.Parameters.AddWithValue("@last_name", LastName);
-                cmd.Parameters.AddWithValue("@patronumyc", Patrnumyc);
-                cmd.Parameters.AddWithValue("@birth_date", BirthDate);
-                cmd.Parameters.AddWithValue("@passport_number", PassportNumber);
-                cmd.Parameters.AddWithValue("@passport_year", PassportYear);
-                cmd.Parameters.AddWithValue("@passport_issuer", PassportIssuer);
-                cmd.Parameters.AddWithValue("@login", Login);
-                cmd.Parameters.AddWithValue("@email", Email);
-                cmd.Parameters.AddWithValue("@role", Role);
-                cmd.Parameters.AddWithValue("@password_hash", HashPassword(Password));
-                cmd.Prepare();
-
-                MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
-
-                if (userData.RecordsAffected != 0) // Если запрос возвратил какой-либо результат, то
-                {
-                    connect.CloseConnection(); // Закрываем соединение с БД
-
-                    return true; // Возвращаем результат
-                }
-
-                // если данных небыло
-                connect.CloseConnection(); // Закрываем соединение с БД
-
-                return false; // Возвращаем результат
-            }
-
-            return false;
-        }
-
+       
         /*
-         * Удалить пользователя из системы по id
+         * Создать пользователя 
          */
         public bool CreateUser()
         {

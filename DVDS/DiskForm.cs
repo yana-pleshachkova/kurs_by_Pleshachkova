@@ -147,5 +147,10 @@ namespace DVDS
         {
             MessageBox.Show(alert);
         }
+
+        private void diskCardAbout_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

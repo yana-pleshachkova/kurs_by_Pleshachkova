@@ -61,11 +61,11 @@ namespace DVDS
          */
         public string HashPassword(string password)
         {
-            return BitConverter.ToString(
-                SHA256.Create().ComputeHash(
-                    Encoding.UTF8.GetBytes(password)
+            return BitConverter.ToString(  //класс BitConverter - BitConverter
+                SHA256.Create().ComputeHash( //Вычисляет SHA256 хэш (шифр) для входных данных
+                    Encoding.UTF8.GetBytes(password) //Представляет кодировку символов для формата UTF-8
                     )
-                ).Replace("-", "").ToLower();
+                ).Replace("-", "").ToLower(); //Возвращает новую строку, в которой все дефисы заменены пустотой
         }
 
         /*
@@ -77,15 +77,15 @@ namespace DVDS
 
             if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
             {
-                string hashedPassword = HashPassword(password);
+                string hashedPassword = HashPassword(password);//хешируем введенный пароль и сохраняем хеш
 
                 // Формируем команду для выбора 1-го пользователя по логину и паролю
                 // Будем использовать подготовленные запросы для защиты БД
-                MySqlCommand cmd = connect.Connection.CreateCommand();
-                cmd.CommandText = "SELECT * FROM `users` WHERE `login` = @login AND `password_hash` = @password AND `deleted_at` IS NULL LIMIT 0, 1";
-                cmd.Parameters.AddWithValue("@login", login);
+                MySqlCommand cmd = connect.Connection.CreateCommand(); //метод - Выполняет инструкцию Transact-SQL для установленного соединения и возвращает количество задействованных в инструкции строк
+                cmd.CommandText = "SELECT * FROM `users` WHERE `login` = @login AND `password_hash` = @password AND `deleted_at` IS NULL LIMIT 0, 1"; //LIMIT 0, 1 - вернет только один результат, либо 0, либо 1 (наподобие Rownum)
+                cmd.Parameters.AddWithValue("@login", login); //Parameters - свойство MySqlCommand, у него есть метод AddWithValue, вернет строку cmd с таким логином
                 cmd.Parameters.AddWithValue("@password", hashedPassword);
-                cmd.Prepare();
+                cmd.Prepare(); //Prepare - метод MySqlCommand, создает 1 этап подготавливаемого запроса
 
                 MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
 
@@ -97,7 +97,7 @@ namespace DVDS
                         User userInfo = new User(
                             userData["login"].ToString(),
                             "",
-                            userData["email"].ToString(),
+                            userData["email"].ToString(), // userData - то, что считали из БД
                             userData["first_name"].ToString(),
                             userData["last_name"].ToString(),
                             userData["patronumyc"].ToString(),
@@ -142,7 +142,7 @@ namespace DVDS
                 // Будем использовать подготовленные запросы для защиты БД
                 MySqlCommand cmd = connect.Connection.CreateCommand();
                 cmd.CommandText = "SELECT * FROM `users` WHERE `id` = @userId AND `deleted_at` IS NULL LIMIT 0, 1";
-                cmd.Parameters.AddWithValue("@userId", id);
+                cmd.Parameters.AddWithValue("@userId", id); //вернет пользователя с таким id 
                 cmd.Prepare();
 
                 MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
@@ -193,26 +193,29 @@ namespace DVDS
         public Session CreateSession()
         {
             DbConnect connect = new DbConnect(); // Создаем экземпляр коннектора к БД
-            string token = Guid.NewGuid().ToString();
-            long lastInsertId = 0;
-            Session newSession = null;
+            string token = Guid.NewGuid().ToString(); //guid - глобальный уникальный идентификатор, создает большую рандомную строчку
+            long lastInsertId = 0; //у long 64 разряда, по умолчанию задаем последний_вставл_Id нулл, чтобы посмотреть изменится ли он
+            Session newSession = null; //и с сессией также
 
             if (connect.OpenConnection()) // Открываем соединение и если оно открыто, то
             {
                 // Формируем команду для генерации сесии пользовтаеля
                 // Будем использовать подготовленные запросы для защиты БД
+                //сначала создадим токен со всеми его полями в БД
                 MySqlCommand cmd = connect.Connection.CreateCommand();
-                cmd.CommandText = "INSERT INTO `tokens` VALUES(NULL, @userId, @token, NULL, CURRENT_TIMESTAMP)";
-                cmd.Parameters.AddWithValue("@userId", Id);
+                cmd.CommandText = "INSERT INTO `tokens` VALUES(NULL, @userId, @token, NULL, CURRENT_TIMESTAMP)"; //CURRENT_TIMESTAMP - текущее время, в начале null - id, т.к. оно автоматически задается
+                cmd.Parameters.AddWithValue("@userId", Id); //выведет с таким id и token-ом
                 cmd.Parameters.AddWithValue("@token", token);
-                cmd.Prepare();
+                cmd.Prepare(); //готовит 1 этап подготавливаемого запроса
 
                 cmd.ExecuteReader(); // Выполним запрос
 
-                lastInsertId = cmd.LastInsertedId;
+                lastInsertId = cmd.LastInsertedId; //изменяем послдений_вставл_id на id, котрый выдала cmd
 
                 connect.CloseConnection(); // Закрываем соединение с БД
             }
+
+            //потом создадим эту же сессию (токен) в приложении, в классе User
 
             connect = new DbConnect();
 
@@ -283,7 +286,7 @@ namespace DVDS
 
                     MySqlDataReader userData = cmd.ExecuteReader(); // Выполним запрос
 
-                    if (userData.RecordsAffected != 0) // Если запрос возвратил какой-либо результат, то
+                    if (userData.RecordsAffected != 0) // Если запрос возвратил какой-либо результат, то   _________ RecordsAffected - кол-во затронутых строк
                     {
                         connect.CloseConnection(); // Закрываем соединение с БД
 
